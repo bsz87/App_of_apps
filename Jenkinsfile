@@ -58,6 +58,18 @@ pipeline {
                 sh "python3 -m pytest test/selenium/seleniumTest.py"
             }
         }
+        stage('Run terraform') {
+            steps {
+                dir('Terraform') {                
+                    git branch: 'main', url: 'https://github.com/bsz87/terraform'
+                    withAWS(credentials:'AWS', region: 'us-east-1') {
+                            sh 'terraform init -backend-config=bartlomiej-szelagowski-panda-devops-core-15'
+                            sh 'terraform apply -auto-approve -var bucket_name=bartlomiej-szelagowski-panda-devops-core-15'
+                            
+                    } 
+                }
+            }
+        }
     }
     post {
         always {
